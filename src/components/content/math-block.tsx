@@ -13,6 +13,8 @@ export function MathBlock({ expression, className }: MathBlockProps) {
     displayMode: true,
     throwOnError: false,
     trust: true,
+    strict: (errorCode: string) =>
+      errorCode === "newLineInDisplayMode" ? "ignore" : "warn",
   });
 
   return (

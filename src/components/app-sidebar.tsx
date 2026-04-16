@@ -72,11 +72,16 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                 >
                   <SidebarMenuItem>
                     <CollapsibleTrigger asChild>
-                      <SidebarMenuButton className="font-medium">
-                        <group.icon className="size-4" />
-                        {group.title}
-                        <PlusIcon className="ml-auto size-3.5 group-data-[state=open]/collapsible:hidden" />
-                        <MinusIcon className="ml-auto size-3.5 group-data-[state=closed]/collapsible:hidden" />
+                      <SidebarMenuButton
+                        className="font-medium"
+                        title={group.title}
+                      >
+                        <group.icon className="size-4 shrink-0" />
+                        <span className="truncate">
+                          {group.shortTitle ?? group.title}
+                        </span>
+                        <PlusIcon className="ml-auto size-3.5 shrink-0 group-data-[state=open]/collapsible:hidden" />
+                        <MinusIcon className="ml-auto size-3.5 shrink-0 group-data-[state=closed]/collapsible:hidden" />
                       </SidebarMenuButton>
                     </CollapsibleTrigger>
                     <CollapsibleContent>
@@ -87,12 +92,14 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                               asChild
                               isActive={pathname === item.url}
                             >
-                              <Link href={item.url}>
-                                {item.title}
+                              <Link href={item.url} title={item.title}>
+                                <span className="truncate">
+                                  {item.shortTitle ?? item.title}
+                                </span>
                                 {item.isSimulator && (
                                   <Badge
                                     variant="secondary"
-                                    className="ml-auto gap-0.5 px-1.5 py-0 text-[10px] font-normal"
+                                    className="ml-auto shrink-0 gap-0.5 px-1.5 py-0 text-[10px] font-normal"
                                   >
                                     <ZapIcon className="size-2.5" />
                                     Sim
