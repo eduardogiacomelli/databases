@@ -5,11 +5,7 @@ import { SectionHeading } from "@/components/content/section-heading";
 import { InfoCallout } from "@/components/content/info-callout";
 import { PageNavigation } from "@/components/content/page-navigation";
 import { navigation } from "@/lib/navigation";
-import {
-  CogIcon,
-  ArrowRightIcon,
-  ZapIcon,
-} from "lucide-react";
+import { CogIcon, ArrowRightIcon, ZapIcon } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 
 const chapter = navigation.find((g) => g.url === "/dashboard/chapter-18")!;
@@ -26,13 +22,13 @@ export default function Chapter18Page() {
 
       <AnimatedSection>
         <SectionHeading as="h2">The execution pipeline</SectionHeading>
-        <p className="text-sm leading-relaxed text-muted-foreground">
+        <p className=" leading-relaxed text-muted-foreground">
           Chapter 18 answers a single question: given a SQL query, what physical
           algorithms does the DBMS use to execute each operation, and what does
           each one cost in block I/Os? This chapter is the bridge from the
           logical operators you know (σ, π, ⋈) to the concrete algorithms the
-          engine actually runs — nested loops, sort-merge, hash partition —
-          each with its own cost formula and sweet spot.
+          engine actually runs — nested loops, sort-merge, hash partition — each
+          with its own cost formula and sweet spot.
         </p>
       </AnimatedSection>
 
@@ -68,12 +64,6 @@ export default function Chapter18Page() {
           ))}
         </div>
       </AnimatedSection>
-
-      <InfoCallout variant="tip" title="Scaffolding in place">
-        These pages exist as placeholders so the sidebar and breadcrumb navigation
-        resolve correctly. Content and simulators land page by page; the JOIN
-        Algorithms simulator is the crown jewel and will be built first.
-      </InfoCallout>
 
       <PageNavigation />
     </div>
