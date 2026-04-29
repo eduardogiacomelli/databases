@@ -1,40 +1,25 @@
-import { codeToHtml } from "shiki";
 import { cn } from "@/lib/utils";
 
-type CodeBlockProps = {
-  code: string;
-  lang?: string;
+type PrerenderedCodeProps = {
+  html: string;
   title?: string;
-  showLineNumbers?: boolean;
   className?: string;
 };
 
-export async function CodeBlock({
-  code,
-  lang = "typescript",
+/**
+ * Client-safe code block. Receives already-highlighted HTML
+ * (typically produced by `shiki.codeToHtml` in a server component).
+ */
+export function PrerenderedCode({
+  html,
   title,
-  showLineNumbers = true,
   className,
-}: CodeBlockProps) {
-  const html = await codeToHtml(code.trim(), {
-    lang,
-    theme: "vitesse-dark",
-    transformers: showLineNumbers
-      ? [
-          {
-            line(node, line) {
-              node.properties["data-line"] = line;
-            },
-          },
-        ]
-      : [],
-  });
-
+}: PrerenderedCodeProps) {
   return (
     <div
       className={cn(
         "code-block overflow-hidden rounded-lg border border-border/50",
-        className,
+        className
       )}
     >
       {title && (
