@@ -1,36 +1,52 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Database Internals — Interactive Notes
 
-## Getting Started
+An interactive companion to the _Fundamentals of Database Systems_ (Elmasri &
+Navathe) chapters on storage and query processing. Every concept ships with a
+playable simulator instead of a static figure.
 
-First, run the development server:
+🔗 **Live demo:** https://databases-2.vercel.app
+
+## What's inside
+
+- **Chapter 16 — Disk Storage & File Structures.** Schema builder, file-access
+  animator (linear vs. binary), hashing simulator with overflow chains.
+- **Chapter 17 — Indexing.** B-tree and B+ tree visualizers, multilevel index
+  fan-out calculator, primary/secondary/clustering walkthroughs.
+- **Chapter 18 — Query Processing.** SQL → relational algebra translator,
+  external sort-merge animator, SELECT strategy comparator (S1–S9), JOIN
+  algorithm animator (J2–J5), pipelining vs. materialization.
+- **Chapter 19 — Query Optimization.** Heuristic rule transformer, cost
+  estimator with catalog stats, dynamic-programming join ordering, worked
+  examples.
+
+## Screenshots
+
+> _Add screenshots here_ — `docs/screenshots/dashboard.png`,
+> `docs/screenshots/join-animator.png`, etc.
+
+## Tech stack
+
+- **Next.js 16** (App Router, React 19, React Compiler)
+- **TypeScript** + **Tailwind CSS v4** + **shadcn/ui**
+- **Framer Motion** for animations · **Zustand** for simulator state
+- **KaTeX** for math · **Shiki** for SQL/code · **@xyflow/react** + **@visx** for diagrams
+
+## Run locally
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
+pnpm install
 pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open <http://localhost:3000>. The dashboard at `/dashboard` is the entry
+point; each chapter and topic has its own route.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Project layout
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```
+src/app/dashboard/chapter-{16..19}/   # page content (one folder per topic)
+src/components/content/               # reusable text/section primitives
+src/components/simulators/            # interactive visualizations
+src/lib/navigation.ts                 # sidebar / chapter index
+content/                              # source notes that drive the pages
+```

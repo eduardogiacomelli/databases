@@ -27,7 +27,6 @@ import {
   ArrowDownUp,
 } from "lucide-react";
 import { MathInline } from "@/components/content/math-block";
-
 /* ==============================================================================
    1. TIPAGENS DO TYPESCRIPT
    ============================================================================== */
@@ -75,14 +74,16 @@ const SchemaNode = ({ data }: NodeProps) => {
                 className="!w-3 !h-3 !bg-amber-500 !-left-2 border-2 border-background"
               />
             )}
-            <span className="font-mono  flex items-center gap-2 text-foreground">
+            <span className="font-mono text-xs flex items-center gap-2 text-foreground">
               {c.isPk && <Key className="w-3.5 h-3.5 text-amber-500" />}
               {!c.isPk && c.isFk && (
                 <LinkIcon className="w-3.5 h-3.5 text-muted-foreground" />
               )}
               <span className={c.isPk ? "font-bold" : ""}>{c.name}</span>
             </span>
-            <span className=" text-muted-foreground font-mono">{c.type}</span>
+            <span className="text-[11px] text-muted-foreground font-mono">
+              {c.type}
+            </span>
             {c.isFk && (
               <Handle
                 type="source"
@@ -102,7 +103,7 @@ const RelationalNode = ({ data }: NodeProps) => {
   const { label, symbol, algorithm, cost } = data as CustomNodeData;
   return (
     <div className="relative flex flex-col items-center">
-      <div className="min-w-[200px] px-5 py-3 bg-background border-2 border-primary/40 text-foreground font-mono rounded-xl shadow-md flex items-center justify-center gap-4 z-10">
+      <div className="min-w-[210px] px-5 py-3 bg-background border-2 border-primary/40 text-foreground font-mono rounded-xl shadow-md flex items-center justify-center gap-4 z-10">
         <Handle type="source" position={Position.Top} className="opacity-0" />
         {symbol && (
           <span className="text-primary font-bold text-2xl flex items-center justify-center">
@@ -119,9 +120,9 @@ const RelationalNode = ({ data }: NodeProps) => {
         />
       </div>
       {(algorithm || cost) && (
-        <div className="absolute top-[105%] flex flex-col items-center w-[260px] pt-1.5 z-20">
+        <div className="absolute top-[105%] flex flex-col items-center w-[280px] pt-1.5 z-20">
           {algorithm && (
-            <span className=" font-sans font-bold text-destructive/80 text-center leading-tight mb-0.5">
+            <span className="text-xs font-sans font-bold text-destructive/80 text-center leading-tight mb-0.5">
               {algorithm}
             </span>
           )}
@@ -147,7 +148,7 @@ const LeafNode = ({ data }: NodeProps) => {
       {(algorithm || cost) && (
         <div className="absolute top-[110%] flex flex-col items-center w-[220px] pt-1.5 z-20">
           {algorithm && (
-            <span className=" font-sans font-bold text-destructive/80 text-center leading-tight mb-0.5">
+            <span className="text-xs font-sans font-bold text-destructive/80 text-center leading-tight mb-0.5">
               {algorithm}
             </span>
           )}
@@ -193,7 +194,7 @@ const AnnotatedEdge = ({
               transform: `translate(-50%, -50%) translate(${labelX}px, ${labelY}px)`,
               pointerEvents: "all",
             }}
-            className="nodrag nopan z-50 bg-background border border-border shadow-sm rounded-md px-2 py-1  font-bold text-destructive flex items-center justify-center"
+            className="nodrag nopan z-50 bg-background border border-border shadow-sm rounded-md px-2 py-1 text-[13px] font-bold text-destructive flex items-center justify-center"
           >
             <MathInline expression={data.cost as string} />
           </div>
@@ -211,7 +212,7 @@ const nodeTypes = {
 const edgeTypes = { annotated: AnnotatedEdge };
 
 /* ==============================================================================
-   3. DADOS INICIAIS DA ÁRVORE (Migração)
+   3. DADOS INICIAIS DA ÁRVORE (Com Agregação Antecipada / Junção Tardia)
    ============================================================================== */
 
 const initialNodes: Node[] = [
@@ -219,7 +220,7 @@ const initialNodes: Node[] = [
   {
     id: "s1",
     type: "schema",
-    position: { x: 50, y: 150 },
+    position: { x: 100, y: 250 },
     data: {
       label: "Individuo",
       columns: [
@@ -231,7 +232,7 @@ const initialNodes: Node[] = [
   {
     id: "s2",
     type: "schema",
-    position: { x: 400, y: 100 },
+    position: { x: -150, y: 0 },
     data: {
       label: "Migra",
       columns: [
@@ -245,7 +246,7 @@ const initialNodes: Node[] = [
   {
     id: "s3",
     type: "schema",
-    position: { x: 750, y: 150 },
+    position: { x: -50, y: 450 },
     data: {
       label: "Pais",
       columns: [
@@ -255,8 +256,7 @@ const initialNodes: Node[] = [
     },
   },
 
-  // --- 2. ÁRVORE PRINCIPAL ---
-  // Ramo País de Origem (PO) - Altamente Seletivo (1 linha)
+  // --- 2. ÁRVORE PRINCIPAL (Metade Inferior Clássica) ---
   {
     id: "leafPO",
     type: "leaf",
@@ -274,7 +274,6 @@ const initialNodes: Node[] = [
     data: { symbol: "σ", label: "nome = 'Brasil'" },
   },
 
-  // Ramo Migra (M)
   {
     id: "leafM",
     type: "leaf",
@@ -282,7 +281,6 @@ const initialNodes: Node[] = [
     data: { label: "M" },
   },
 
-  // Join PO com M
   {
     id: "joinM",
     type: "operator",
@@ -301,7 +299,6 @@ const initialNodes: Node[] = [
     data: { symbol: "σ", label: "dtMigra >= '01/01/2020'" },
   },
 
-  // Ramo Individuo (I)
   {
     id: "leafI",
     type: "leaf",
@@ -309,7 +306,6 @@ const initialNodes: Node[] = [
     data: { label: "I" },
   },
 
-  // Join M com I
   {
     id: "joinI",
     type: "operator",
@@ -328,49 +324,60 @@ const initialNodes: Node[] = [
     data: { symbol: "σ", label: "dtNasc >= '01/01/2000'" },
   },
 
-  // Ramo País de Destino (PD)
+  // --- 3. TOPO DA ÁRVORE (A Otimização Avançada do Usuário) ---
+
+  // Agregação ACONTECE ANTES do último Join!
+  {
+    id: "agg",
+    type: "operator",
+    position: { x: 490, y: 300 },
+    data: {
+      symbol: "π",
+      label: "M.idPD, COUNT(M.*) AS n",
+      algorithm: "Hash Aggregation (Memória)",
+      cost: "O(k_{MBI2000})",
+    },
+  },
+
+  // O Having corta os destinos impopulares
+  {
+    id: "hav",
+    type: "operator",
+    position: { x: 490, y: 160 },
+    data: { symbol: "σ", label: "n > 10000" },
+  },
+
+  // Folha do País Destino (Agora puxada para o topo)
   {
     id: "leafPD",
     type: "leaf",
-    position: { x: 800, y: 460 },
+    position: { x: 800, y: 160 },
     data: { label: "PD" },
   },
 
-  // Join com PD
+  // O Join TARDIO. Somente os k_hav países sobreviventes buscam PD.* no disco
   {
     id: "joinPD",
     type: "operator",
-    position: { x: 640, y: 320 },
+    position: { x: 640, y: 20 },
     data: {
       symbol: "⨝",
       label: "M.idPD = PD.idP",
       algorithm: "Laço aninhado c/ busca",
-      cost: "O(k_{MBI2000} \\log|Pais| + k_{final})",
-    },
-  },
-
-  // Agregação, Filtro e Ordenação
-  {
-    id: "agg",
-    type: "operator",
-    position: { x: 640, y: 180 },
-    data: {
-      symbol: "π",
-      label: "PD.*, COUNT(M.*) AS n",
-      algorithm: "Hash Aggregation",
-      cost: "O(k_{final})",
+      cost: "O(k_{hav} \\log|Pais| + k_{hav})",
     },
   },
   {
-    id: "hav",
+    id: "piFinal",
     type: "operator",
-    position: { x: 640, y: 40 },
-    data: { symbol: "σ", label: "n > 10000" },
+    position: { x: 640, y: -120 },
+    data: { symbol: "π", label: "PD.*, n" },
   },
+  // Ordenação e Projeção Final
   {
     id: "sort",
     type: "operator",
-    position: { x: 640, y: -100 },
+    position: { x: 640, y: -240 },
     data: {
       symbol: <ArrowDownUp className="w-5 h-5" />,
       label: "ORDER BY n DESC",
@@ -393,7 +400,7 @@ const treeEdge = {
 };
 
 const initialEdges: Edge[] = [
-  // --- ARESTAS DO ESQUEMA (Cores distintas para cada FK de Migra) ---
+  // --- ARESTAS DO ESQUEMA ---
   {
     id: "fk1",
     source: "s2",
@@ -403,7 +410,7 @@ const initialEdges: Edge[] = [
     ...schemaEdge,
     markerEnd: { type: MarkerType.ArrowClosed, color: "#10b981" },
     style: { ...schemaEdge.style, stroke: "#10b981" },
-  }, // Esmeralda -> Individuo
+  },
   {
     id: "fk2",
     source: "s2",
@@ -413,7 +420,7 @@ const initialEdges: Edge[] = [
     ...schemaEdge,
     markerEnd: { type: MarkerType.ArrowClosed, color: "#ec4899" },
     style: { ...schemaEdge.style, stroke: "#ec4899" },
-  }, // Rosa -> Pais Origem
+  },
   {
     id: "fk3",
     source: "s2",
@@ -423,9 +430,9 @@ const initialEdges: Edge[] = [
     ...schemaEdge,
     markerEnd: { type: MarkerType.ArrowClosed, color: "#06b6d4" },
     style: { ...schemaEdge.style, stroke: "#06b6d4" },
-  }, // Ciano -> Pais Destino
+  },
 
-  // --- ÁRVORE PRINCIPAL ---
+  // --- ÁRVORE PRINCIPAL (Fluxo Otimizado) ---
   {
     id: "e1",
     source: "leafPO",
@@ -465,39 +472,44 @@ const initialEdges: Edge[] = [
     ...treeEdge,
     data: { cost: "k_{MBI}" },
   },
+
+  // Agregação Antecipada: O fluxo vai do Sigma do Indivíduo direto para o Group By!
   {
     id: "e8",
     source: "sigI",
-    target: "joinPD",
+    target: "agg",
     ...treeEdge,
     data: { cost: "k_{MBI2000}" },
   },
-  { id: "e9", source: "leafPD", target: "joinPD", ...treeEdge },
-
   {
-    id: "e10",
-    source: "joinPD",
-    target: "agg",
-    ...treeEdge,
-    data: { cost: "k_{final}" },
-  },
-  {
-    id: "e11",
+    id: "e9",
     source: "agg",
     target: "hav",
     ...treeEdge,
-    data: { cost: "k_{grp}" },
+    data: { cost: "k_{dest}" },
   },
+
+  // O Join é feito depois do Having, apenas com o k_hav minúsculo
   {
-    id: "e12",
+    id: "e10",
     source: "hav",
-    target: "sort",
+    target: "joinPD",
     ...treeEdge,
     data: { cost: "k_{hav}" },
   },
+  { id: "e11", source: "leafPD", target: "joinPD", ...treeEdge },
+
+  {
+    id: "e12",
+    source: "joinPD",
+    target: "piFinal",
+    ...treeEdge,
+    data: { cost: "k_{hav}" },
+  },
+  { id: "e13", source: "piFinal", target: "sort", ...treeEdge },
 ];
 
-export default function MigracaoOptimization() {
+export default function MigracaoOtimizacaoAvancada() {
   const [nodes, , onNodesChange] = useNodesState(initialNodes);
   const [edges, , onEdgesChange] = useEdgesState(initialEdges);
 
@@ -523,9 +535,9 @@ export default function MigracaoOptimization() {
             className="bg-background/95 backdrop-blur-md px-8 py-4 rounded-b-2xl border border-t-0 shadow-lg"
           >
             <h1 className="text-2xl font-bold font-heading text-foreground text-center flex flex-col items-center gap-2">
-              Complexidade Total
+              Complexidade Total (Agregação Antecipada)
               <span className="text-destructive mt-1">
-                <MathInline expression="O(\log|\text{Pais}| + \log|M| + k_{MB20}\log|I| + k_{MBI2000}\log|\text{Pais}| + k_{hav}\log k_{hav})" />
+                <MathInline expression="O(\log|\text{Pais}| + \log|M| + k_{MB20}\log|I| + k_{MBI2000} + k_{hav}\log|\text{Pais}|)" />
               </span>
             </h1>
           </Panel>
@@ -535,77 +547,49 @@ export default function MigracaoOptimization() {
             className="bg-background/95 backdrop-blur-md p-6 rounded-2xl border-2 border-primary/20 shadow-2xl m-6 w-[480px] pointer-events-none"
           >
             <h3 className="font-bold text-xl text-primary mb-5 flex items-center gap-2 border-b border-primary/20 pb-3">
-              <BookOpen className="w-6 h-6" /> Lógica Otimizada (Heurísticas)
+              <BookOpen className="w-6 h-6" /> Late Materialization (Sua Ideia!)
             </h3>
 
             <div className="flex flex-col gap-5 text-sm font-medium text-muted-foreground">
               <div>
                 <strong className="text-foreground text-base">
-                  Início pela Restrição Extrema
+                  O Problema do Join Precoce
                 </strong>
-                <p className=" mt-1.5 leading-relaxed">
-                  A restrição{" "}
-                  <MathInline expression="\sigma_{\text{nome}='Brasil'}" /> atua
-                  na <strong>chave candidata</strong> da tabela{" "}
-                  <MathInline expression="\text{Pais}" />, retornando exatamente{" "}
-                  <MathInline expression="1" /> linha de forma quase imediata. É
-                  o melhor ponto de partida.
+                <p className="text-[13px] mt-1.5 leading-relaxed">
+                  Fazer o Join com <MathInline expression="PD" /> antes de
+                  agrupar faria o banco de dados acessar o disco da tabela País
+                  para <MathInline expression="k_{MBI2000}" /> registros (talvez
+                  milhões de brasileiros). É um desperdício enorme de I/O, visto
+                  que muitos emigraram para os mesmos destinos.
                 </p>
               </div>
 
               <div>
                 <strong className="text-foreground text-base">
-                  Cascata de Laços Aninhados c/ Busca
+                  A Solução: Agregação Antecipada
                 </strong>
-                <p className=" mt-1.5 leading-relaxed">
-                  Como o enunciado afirma que o volume do filtro anterior é
-                  sempre menor que o filtro das próximas tabelas, o otimizador
-                  usa o resultado de uma etapa para buscar na próxima tabela
-                  usando índices (<MathInline expression="M.idPO" />, depois{" "}
-                  <MathInline expression="I.idI" />, e{" "}
-                  <MathInline expression="PD.idP" />
-                  ). <strong>Nenhum Full Table Scan é realizado.</strong>
+                <p className="text-[13px] mt-1.5 leading-relaxed">
+                  Como o agrupamento é por <MathInline expression="PD.*" /> (que
+                  depende unicamente de <MathInline expression="PD.idP" />
+                  ), nós agrupamos os dados pela Chave Estrangeira{" "}
+                  <MathInline expression="M.idPD" /> que já está na memória RAM,
+                  gerando a contagem de forma ultrarrápida com{" "}
+                  <em>Hash Aggregation</em>.
                 </p>
               </div>
 
               <div>
                 <strong className="text-foreground text-base">
-                  Filtragem On-the-fly
+                  O Late Join
                 </strong>
-                <p className=" mt-1.5 leading-relaxed">
-                  Filtros de data (<MathInline expression="\ge 2020" /> e{" "}
-                  <MathInline expression="\ge 2000" />) são aplicados na memória
-                  RAM imediatamente após os joins recuperarem as tuplas do
-                  disco, reduzindo o volume (
-                  <MathInline expression="k_{MB20}" /> e{" "}
-                  <MathInline expression="k_{MBI2000}" />) propagado para a
-                  próxima etapa.
+                <p className="text-[13px] mt-1.5 leading-relaxed">
+                  O filtro do <strong>HAVING</strong> joga fora quase todos os
+                  agrupamentos, deixando apenas{" "}
+                  <MathInline expression="k_{hav}" /> destinos hiperpopulares
+                  (ex: 5 países). Somente então fazemos o Join com a tabela País
+                  para buscar os dados desses 5 países, reduzindo o custo de I/O
+                  do topo da árvore a quase zero.
                 </p>
-              </div>
-
-              <div className="mt-2 pt-4 border-t border-border/50">
-                <span className="text-sm font-bold text-foreground">
-                  Símbolos:
-                </span>
-                <ul className=" mt-2 grid grid-cols-2 gap-y-3 text-destructive font-bold">
-                  <li>
-                    <MathInline expression="k_{PO}" /> = Histórico de Saídas BR
-                  </li>
-                  <li>
-                    <MathInline expression="k_{MB20}" /> = Saídas BR pós-2020
-                  </li>
-                  <li>
-                    <MathInline expression="k_{MBI2000}" /> = ...nascidos
-                    pós-2000
-                  </li>
-                  <li>
-                    <MathInline expression="k_{grp}" /> = Agrupamentos
-                    (Destinos)
-                  </li>
-                  <li>
-                    <MathInline expression="k_{hav}" /> = Destinos &gt; 10000
-                  </li>
-                </ul>
               </div>
             </div>
           </Panel>
